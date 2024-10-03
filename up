@@ -1,0 +1,11 @@
+#!/bin/bash
+NC='\033[0m' # No Color
+CYAN='\033[1;36m'
+ipaddr=$(ip addr show tun0 | grep "inet" | head -n 1 | awk '/inet/ {print $2}' | cut -d'/' -f1)
+echo -e "${CYAN}http://"$ipaddr"/"$1"\n"
+echo -e 'wget -O '$1' http://'$ipaddr'/'$1"\n"
+echo -e 'curl -o '$1' http://'$ipaddr'/'$1"${NC}\n"
+
+echo -e 'wget -O '$1' http://'$ipaddr'/'$1 | tr -d '\n' | xclip -selection clipboard
+
+python3 -m http.server 80
